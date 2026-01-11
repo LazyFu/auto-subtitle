@@ -8,8 +8,10 @@ setup(
     author="Miguel Piedrafita",
     install_requires=[
         'openai-whisper',
+        'ffmpeg-python',
+        'deep-translator',
     ],
-    description="Automatically generate and embed subtitles into your videos",
+    description="Automatically generate and embed subtitles into your videos with optional translation",
     entry_points={
         'console_scripts': ['auto_subtitle=auto_subtitle.cli:main'],
     },

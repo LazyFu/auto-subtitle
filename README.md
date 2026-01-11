@@ -31,6 +31,12 @@ Adding `--task translate` will translate the subtitles into English:
 
     auto_subtitle /path/to/video.mp4 --task translate
 
+And you can translate to other languages using deeptranslator:
+
+    auto_subtitle /path/to/video.mp4 --translate_to zh-CN
+
+> Notice that Chinese-simplified is zh-CN, not zh.
+
 Run the following to view all available options:
 
     auto_subtitle --help
