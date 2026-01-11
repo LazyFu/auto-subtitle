@@ -8,18 +8,14 @@ To get started, you'll need Python 3.7 or newer. Install the binary by running t
 
     pip install git+https://github.com/m1guelpf/auto-subtitle.git
 
-You'll also need to install [`ffmpeg`](https://ffmpeg.org/), which is available from most package managers:
+You actually need `ffmpeg-python`, rather than `ffmpeg`.
 
-```bash
-# on Ubuntu or Debian
-sudo apt update && sudo apt install ffmpeg
+Alternatively you can clone this repository and run:
 
-# on MacOS using Homebrew (https://brew.sh/)
-brew install ffmpeg
+    pip install -r requirements.txt
+    python -m auto_subtitle.cli ...
 
-# on Windows using Chocolatey (https://chocolatey.org/)
-choco install ffmpeg
-```
+> Maybe you want to use the cuda version of [pytorch](https://pytorch.org/get-started/locally/)
 
 ## Usage
 

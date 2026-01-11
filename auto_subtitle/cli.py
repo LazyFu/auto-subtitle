@@ -34,22 +34,41 @@ def main():
     output_srt: bool = args.pop("output_srt")
     srt_only: bool = args.pop("srt_only")
     language: str = args.pop("language")
+    videos = args.pop("video")
     
     os.makedirs(output_dir, exist_ok=True)
 
-    if model_name.endswith(".en"):
-        warnings.warn(
-            f"{model_name} is an English-only model, forcing English detection.")
-        args["language"] = "en"
-    # if translate task used and language argument is set, then use it
-    elif language != "auto":
-        args["language"] = language
-        
-    model = whisper.load_model(model_name)
-    audios = get_audio(args.pop("video"))
-    subtitles = get_subtitles(
-        audios, output_srt or srt_only, output_dir, lambda audio_path: model.transcribe(audio_path, **args)
-    )
+    subtitles = {}
+    videos_to_transcribe = []
+    srt_base_dir = output_dir if output_srt or srt_only else tempfile.gettempdir()
+
+    for path in videos:
+        srt_path = os.path.join(srt_base_dir, f"{filename(path)}.srt")
+        subtitle_valid = False
+        if os.path.exists(srt_path):
+            if os.path.getmtime(srt_path) >= os.path.getmtime(path):
+                subtitle_valid = True
+                subtitles[path] = srt_path
+                print(f"Using cached subtitles for {filename(path)} from {srt_path}")
+
+        if not subtitle_valid:
+            videos_to_transcribe.append(path)
+
+    if videos_to_transcribe:
+        if model_name.endswith(".en"):
+            warnings.warn(
+                f"{model_name} is an English-only model, forcing English detection.")
+            args["language"] = "en"
+        elif language != "auto":
+            args["language"] = language
+            
+        model = whisper.load_model(model_name)
+        audios = get_audio(videos_to_transcribe)
+        subtitles.update(
+            get_subtitles(
+                audios, output_srt or srt_only, output_dir, lambda audio_path: model.transcribe(audio_path, **args)
+            )
+        )
 
     if srt_only:
         return
@@ -63,7 +82,7 @@ def main():
         audio = video.audio
 
         ffmpeg.concat(
-            video.filter('subtitles', srt_path, force_style="OutlineColour=&H40000000,BorderStyle=3"), audio, v=1, a=1
+            video.filter('subtitles', filename=srt_path, force_style="OutlineColour=&H40000000,BorderStyle=3"), audio, v=1, a=1
         ).output(out_path).run(quiet=True, overwrite_output=True)
 
         print(f"Saved subtitled video to {os.path.abspath(out_path)}.")
