@@ -3,3 +3,9 @@ dist
 *.egg-info
 auto_subtitle/__pycache__
 build
+
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.srt
